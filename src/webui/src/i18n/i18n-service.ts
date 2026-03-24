@@ -1,91 +1,100 @@
 import zhCN from "./zh-CN.js";
 import enUS from "./en-US.js";
 import urPK from "./ur-PK.js";
+import ruRU from "./ru-RU.js";
 
-/** Language dictionary type - maps translation keys to translated strings */
+/** Тип словаря языка — сопоставляет ключи перевода со строками */
 export type LanguageDictionary = Record<string, string>;
 
-/** Supported language codes */
-export type SupportedLanguage = "zh-CN" | "en-US" | "ur-PK";
+/** Поддерживаемые коды языков */
+export type SupportedLanguage = "zh-CN" | "en-US" | "ur-PK" | "ru-RU";
 
-/** All available language resources */
+/** Все доступные языковые ресурсы */
 export type LanguageResources = Record<SupportedLanguage, LanguageDictionary>;
 
-/** Translation parameters for string interpolation */
+/** Параметры перевода для интерполяции строк */
 export type TranslationParams = Record<string, string | number>;
 
 /**
- * I18nService - Internationalization Service
- * Handles language switching, translation lookup, and persistence.
+ * I18nService - Сервис интернационализации
+ * Управляет переключением языков, поиском переводов и их сохранением.
  */
 export class I18nService {
   static STORAGE_KEY: string = "language";
-  static DEFAULT_LANG: SupportedLanguage = "zh-CN"; // Default fallback
-  static currentLang: SupportedLanguage = "zh-CN";
+  static DEFAULT_LANG: SupportedLanguage = "ru-RU"; // Русский по умолчанию
+  static currentLang: SupportedLanguage = "ru-RU";
 
-  // Translation Resources
+  // Ресурсы переводов
   static resources: LanguageResources = {
     "zh-CN": zhCN as LanguageDictionary,
     "en-US": enUS as LanguageDictionary,
     "ur-PK": urPK as LanguageDictionary,
+    "ru-RU": ruRU as LanguageDictionary,
   };
 
-  // Initialize
+  // Инициализация
   static init(): void {
     const savedLang = localStorage.getItem(this.STORAGE_KEY);
     if (savedLang && this.resources[savedLang as SupportedLanguage]) {
       this.currentLang = savedLang as SupportedLanguage;
     } else {
-      // Auto detect
+      // Автоопределение
       const navLang = navigator.language;
-      if (navLang.startsWith("en")) {
+      if (navLang.startsWith("zh")) {
+        this.currentLang = "zh-CN";
+      } else if (navLang.startsWith("en")) {
         this.currentLang = "en-US";
+      } else if (navLang.startsWith("ur")) {
+        this.currentLang = "ur-PK";
       } else {
-        this.currentLang = "zh-CN"; // Default to Chinese
+        // Если язык не распознан или это русский/СНГ — используем дефолт
+        this.currentLang = this.DEFAULT_LANG;
       }
     }
-    document.documentElement.lang = this.currentLang;
     this.applyLanguage();
   }
 
-  // Set Language
-  static setLanguage(lang: string): void {
-    if (lang === "auto") {
-      localStorage.removeItem(this.STORAGE_KEY);
-      this.init(); // Re-detect
-    } else if (this.resources[lang as SupportedLanguage]) {
-      this.currentLang = lang as SupportedLanguage;
+  /**
+   * Установить текущий язык и сохранить в хранилище
+   * @param lang Код поддерживаемого языка
+   */
+  static setLanguage(lang: SupportedLanguage): void {
+    if (this.resources[lang]) {
+      this.currentLang = lang;
       localStorage.setItem(this.STORAGE_KEY, lang);
-      document.documentElement.lang = lang;
       this.applyLanguage();
     }
   }
 
-  static getLanguage(): string {
-    return localStorage.getItem(this.STORAGE_KEY) || "auto";
-  }
-
-  // Translate
+  /**
+   * Перевести ключ с опциональными параметрами
+   * @param key Ключ перевода (например, 'app.name')
+   * @param params Пары ключ-значение для подстановки
+   * @returns Переведенная строка или сам ключ, если перевод не найден
+   */
   static t(key: string, params: TranslationParams = {}): string {
     const dict =
       this.resources[this.currentLang] || this.resources[this.DEFAULT_LANG];
     let text = dict[key] || key;
 
-    // Replace params: {name} -> value
+    // Замена параметров: {name} -> значение
     for (const [k, v] of Object.entries(params)) {
       text = text.replace(new RegExp(`\\{${k}\\}`, "g"), String(v));
     }
     return text;
   }
 
-  // Apply translation to all [data-i18n] elements
+  // Применить перевод ко всем элементам [data-i18n]
   static applyLanguage(): void {
-    // Set directionality
+    // Направление текста
     if (this.currentLang === "ur-PK") {
       document.documentElement.dir = "rtl";
     } else {
       document.documentElement.dir = "ltr";
     }
+
+    // Обновление атрибута lang в HTML
+    document.documentElement.lang = this.currentLang;
 
     const selectors = [
       "[data-i18n]",
@@ -112,15 +121,15 @@ export class I18nService {
       ];
       attrs.forEach((attr) => {
         const k = el.getAttribute(`data-i18n-${attr}`);
-        if (k) el.setAttribute(attr, this.t(k));
+        if (k) {
+          el.setAttribute(attr, this.t(k));
+        }
       });
     });
 
-    // Dispatch event for components to update themselves
+    // Генерация события для реакции компонентов
     window.dispatchEvent(
-      new CustomEvent("language-changed", {
-        detail: { lang: this.currentLang },
-      }),
+      new CustomEvent("language-changed", { detail: this.currentLang }),
     );
   }
 }
