@@ -414,42 +414,42 @@
         <div id="settings-page" class="page">
           <div class="container">
             <mdui-list>
-              <mdui-list-item icon="settings_applications" id="settings-module-entry">
+              <mdui-list-item icon="settings_applications" id="settings-module-entry" clickable>
                 <span data-i18n="settings.module">模块设置</span>
                 <mdui-icon slot="end-icon" name="chevron_right"></mdui-icon>
               </mdui-list-item>
               <mdui-divider></mdui-divider>
-              <mdui-list-item icon="swap_vert" id="settings-proxy-entry">
+              <mdui-list-item icon="swap_vert" id="settings-proxy-entry" clickable>
                 <span data-i18n="settings.proxy">代理设置</span>
                 <mdui-icon slot="end-icon" name="chevron_right"></mdui-icon>
               </mdui-list-item>
               <mdui-divider></mdui-divider>
-              <mdui-list-item icon="alt_route" id="settings-routing-entry">
+              <mdui-list-item icon="alt_route" id="settings-routing-entry" clickable>
                 <span data-i18n="settings.routing">路由规则</span>
                 <mdui-icon slot="end-icon" name="chevron_right"></mdui-icon>
               </mdui-list-item>
               <mdui-divider></mdui-divider>
-              <mdui-list-item icon="dns" id="settings-dns-entry">
+              <mdui-list-item icon="dns" id="settings-dns-entry" clickable>
                 <span data-i18n="settings.dns">DNS 设置</span>
                 <mdui-icon slot="end-icon" name="chevron_right"></mdui-icon>
               </mdui-list-item>
               <mdui-divider></mdui-divider>
-              <mdui-list-item icon="language" id="settings-language">
+              <mdui-list-item icon="language" id="settings-language" clickable>
                 <span data-i18n="settings.language">语言设置</span>
                 <mdui-icon slot="end-icon" name="chevron_right"></mdui-icon>
               </mdui-list-item>
               <mdui-divider></mdui-divider>
-              <mdui-list-item icon="palette" id="settings-theme">
+              <mdui-list-item icon="palette" id="settings-theme" clickable>
                 <span data-i18n="settings.theme">主题与颜色</span>
                 <mdui-icon slot="end-icon" name="chevron_right"></mdui-icon>
               </mdui-list-item>
               <mdui-divider></mdui-divider>
-              <mdui-list-item icon="article" id="settings-logs-entry">
+              <mdui-list-item icon="article" id="settings-logs-entry" clickable>
                 <span data-i18n="settings.logs">日志</span>
                 <mdui-icon slot="end-icon" name="chevron_right"></mdui-icon>
               </mdui-list-item>
               <mdui-divider></mdui-divider>
-              <mdui-list-item icon="info" id="settings-about">
+              <mdui-list-item icon="info" id="settings-about" clickable>
                 <span data-i18n="settings.about">关于</span>
                 <mdui-icon slot="end-icon" name="chevron_right"></mdui-icon>
               </mdui-list-item>
@@ -638,6 +638,16 @@
       </div>
       <mdui-button slot="action" variant="text" id="dns-host-cancel" data-i18n="common.cancel">取消</mdui-button>
       <mdui-button slot="action" variant="filled" id="dns-host-save" data-i18n="common.save">保存</mdui-button>
+    </mdui-dialog>
+
+    <!-- Language Selection Dialog -->
+    <mdui-dialog id="language-dialog" headline="Language" data-i18n-headline="settings.language">
+      <mdui-list id="language-list">
+        <mdui-list-item clickable value="zh-CN">简体中文</mdui-list-item>
+        <mdui-list-item clickable value="en-US">English</mdui-list-item>
+        <mdui-list-item clickable value="ru-RU">Русский</mdui-list-item>
+      </mdui-list>
+      <mdui-button slot="action" variant="text" id="language-cancel" data-i18n="common.cancel">取消</mdui-button>
     </mdui-dialog>
 
     <script src="/src/main.ts" type="module"></script>
