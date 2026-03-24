@@ -1,4 +1,4 @@
-name: 构建 Manager
+name: Сборка Net Proxy Manager
 
 on:
   workflow_dispatch:
@@ -12,17 +12,18 @@ on:
 
 jobs:
   build:
-    name: 构建 APK
+    name: Сборка APK
     runs-on: ubuntu-latest
 
     steps:
-      - name: 拉取代码
+      - name: Получение кода
         uses: actions/checkout@v6
         with:
           submodules: "recursive"
           fetch-depth: 0
 
-      - name: 写入签名密钥
+      - name: Подготовка ключей подписи
+        # Условие: если это не pull_request и ветка main, либо если это тег
         if: ${{ ( github.event_name != 'pull_request' && github.ref == 'refs/heads/main' ) || github.ref_type == 'tag' }}
         working-directory: Manager
         run: |
@@ -34,35 +35,35 @@ jobs:
             echo '${{ secrets.KEY_STORE }}' | base64 --decode > key.jks
           fi
 
-      - name: 设置 Java
+      - name: Настройка Java
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
 
-      - name: 设置 Gradle
+      - name: Настройка Gradle
         uses: gradle/actions/setup-gradle@v5
 
-      - name: 构建 APK
+      - name: Сборка APK
         working-directory: Manager
         run: |
           ./gradlew assemble
 
-      - name: 上传 Release APK
+      - name: Загрузка Release APK
         uses: actions/upload-artifact@v7
         with:
           name: "NetProxy-release"
           path: "Manager/app/build/outputs/apk/release/*.apk"
           compression-level: 9
 
-      - name: 上传 Release Mapping
+      - name: Загрузка Release Mapping (карта соответствий)
         uses: actions/upload-artifact@v7
         with:
           name: "NetProxy-release-mappings"
           path: "Manager/app/build/outputs/mapping/release"
           compression-level: 9
 
-      - name: 上传 Debug APK
+      - name: Загрузка Debug APK
         uses: actions/upload-artifact@v7
         with:
           name: "NetProxy-debug"
