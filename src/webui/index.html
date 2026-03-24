@@ -6,7 +6,6 @@
     <title data-i18n="app.name">NetProxy</title>
 
     <style>
-      /* 遮罩层样式 */
       #fouc-overlay {
         position: fixed;
         top: 0;
@@ -16,7 +15,6 @@
         z-index: 99999;
         transition: opacity 0.15s ease-out;
       }
-
       #fouc-overlay.fade-out {
         opacity: 0;
         pointer-events: none;
@@ -28,39 +26,15 @@
         try {
           var savedTheme = localStorage.getItem("theme") || "auto";
           var html = document.documentElement;
-
-          html.classList.remove(
-            "mdui-theme-light",
-            "mdui-theme-dark",
-            "mdui-theme-auto",
-          );
-
-          var isDark =
-            savedTheme === "dark" ||
-            (savedTheme === "auto" &&
-              window.matchMedia &&
-              window.matchMedia("(prefers-color-scheme: dark)").matches);
-
-          if (savedTheme === "light") {
-            html.classList.add("mdui-theme-light");
-          } else if (savedTheme === "dark") {
-            html.classList.add("mdui-theme-dark");
-          } else {
-            html.classList.add("mdui-theme-auto");
-          }
+          html.classList.remove("mdui-theme-light", "mdui-theme-dark", "mdui-theme-auto");
+          var isDark = savedTheme === "dark" || (savedTheme === "auto" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+          if (savedTheme === "light") { html.classList.add("mdui-theme-light"); } 
+          else if (savedTheme === "dark") { html.classList.add("mdui-theme-dark"); } 
+          else { html.classList.add("mdui-theme-auto"); }
 
           var style = document.createElement("style");
           var fallbackColor = isDark ? "#141218" : "#fef7ff";
-
-          if (savedTheme === "auto") {
-            style.textContent =
-              "#fouc-overlay { background-color: var(--background, " +
-              fallbackColor +
-              "); }";
-          } else {
-            style.textContent =
-              "#fouc-overlay { background-color: " + fallbackColor + "; }";
-          }
+          style.textContent = "#fouc-overlay { background-color: " + (savedTheme === "auto" ? "var(--background, " + fallbackColor + ")" : fallbackColor) + "; }";
           document.head.appendChild(style);
         } catch (e) {
           document.documentElement.classList.add("mdui-theme-auto");
@@ -85,36 +59,23 @@
           var overlay = document.getElementById("fouc-overlay");
           if (overlay) {
             overlay.classList.add("fade-out");
-            setTimeout(function () {
-              overlay.remove();
-            }, 150);
+            setTimeout(function () { overlay.remove(); }, 150);
           }
         }
-
         function checkStylesLoaded() {
           var testEl = document.createElement("div");
           testEl.style.cssText = "position:absolute;visibility:hidden;";
           document.body.appendChild(testEl);
-          var computed = getComputedStyle(testEl);
-          var mduiLoaded =
-            computed.getPropertyValue("--mdui-color-primary") !== "";
+          var mduiLoaded = getComputedStyle(testEl).getPropertyValue("--mdui-color-primary") !== "";
           testEl.remove();
           return mduiLoaded;
         }
-
         function tryHideOverlay() {
-          if (checkStylesLoaded()) {
-            hideOverlay();
-          } else {
-            requestAnimationFrame(tryHideOverlay);
-          }
+          if (checkStylesLoaded()) hideOverlay();
+          else requestAnimationFrame(tryHideOverlay);
         }
-
-        if (document.readyState === "loading") {
-          document.addEventListener("DOMContentLoaded", tryHideOverlay);
-        } else {
-          requestAnimationFrame(tryHideOverlay);
-        }
+        if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", tryHideOverlay);
+        else requestAnimationFrame(tryHideOverlay);
         setTimeout(hideOverlay, 2000);
       })();
     </script>
@@ -124,34 +85,25 @@
         <div style="width: 24px"></div>
         <mdui-top-app-bar-title data-i18n="app.name">NetProxy</mdui-top-app-bar-title>
         <div style="flex-grow: 1"></div>
-        <mdui-button-icon
-          icon="edit"
-          id="edit-dashboard-btn"
-          style="display: none"
-        ></mdui-button-icon>
+        <mdui-button-icon icon="edit" id="edit-dashboard-btn" style="display: none"></mdui-button-icon>
       </mdui-top-app-bar>
 
       <mdui-layout-main id="main-content">
+        <!-- Status Page -->
         <div id="status-page" class="page active">
           <div class="dashboard-grid" id="dashboard-grid">
             <div class="common-card full-width height-2 speed-card" id="card-speed">
-              <div class="card-delete-btn">
-                <mdui-icon name="close"></mdui-icon>
-              </div>
+              <div class="card-delete-btn"><mdui-icon name="close"></mdui-icon></div>
               <div class="card-header">
                 <mdui-icon name="speed" class="card-icon"></mdui-icon>
                 <span class="card-title" data-i18n="status.network_chart">网络速度</span>
                 <div class="header-speed-text" id="header-speed-text"></div>
               </div>
-              <div class="card-content">
-                <div class="chart-area" id="speed-chart-container"></div>
-              </div>
+              <div class="card-content"><div class="chart-area" id="speed-chart-container"></div></div>
             </div>
 
             <div class="common-card half-width height-2 mode-card" id="card-mode">
-              <div class="card-delete-btn">
-                <mdui-icon name="close"></mdui-icon>
-              </div>
+              <div class="card-delete-btn"><mdui-icon name="close"></mdui-icon></div>
               <div class="card-header">
                 <mdui-icon name="call_split" class="card-icon"></mdui-icon>
                 <span class="card-title" data-i18n="status.outbound_mode">出站模式</span>
@@ -175,39 +127,25 @@
             </div>
 
             <div class="common-card half-width height-1" id="card-external-ip">
-              <div class="card-delete-btn">
-                <mdui-icon name="close"></mdui-icon>
-              </div>
+              <div class="card-delete-btn"><mdui-icon name="close"></mdui-icon></div>
               <div class="card-header">
                 <mdui-icon name="network_check" class="card-icon" id="network-detection-icon"></mdui-icon>
                 <span class="card-title" data-i18n="status.network_detection">网络检测</span>
               </div>
-              <div class="card-content">
-                <div class="card-value" id="external-ip">
-                  <span class="loading-spinner"></span>
-                </div>
-              </div>
+              <div class="card-content"><div class="card-value" id="external-ip"><span class="loading-spinner"></span></div></div>
             </div>
 
             <div class="common-card half-width height-1" id="card-internal-ip">
-              <div class="card-delete-btn">
-                <mdui-icon name="close"></mdui-icon>
-              </div>
+              <div class="card-delete-btn"><mdui-icon name="close"></mdui-icon></div>
               <div class="card-header">
                 <mdui-icon name="devices" class="card-icon"></mdui-icon>
                 <span class="card-title" data-i18n="status.internal_ip">内网IP</span>
               </div>
-              <div class="card-content">
-                <div class="card-value" id="internal-ip">
-                  <span class="loading-spinner"></span>
-                </div>
-              </div>
+              <div class="card-content"><div class="card-value" id="internal-ip"><span class="loading-spinner"></span></div></div>
             </div>
 
             <div class="common-card half-width height-2 traffic-card" id="card-traffic">
-              <div class="card-delete-btn">
-                <mdui-icon name="close"></mdui-icon>
-              </div>
+              <div class="card-delete-btn"><mdui-icon name="close"></mdui-icon></div>
               <div class="card-header">
                 <mdui-icon name="data_saver_off" class="card-icon"></mdui-icon>
                 <span class="card-title" data-i18n="status.traffic_today">流量统计</span>
@@ -221,65 +159,39 @@
                     </svg>
                   </div>
                   <div class="traffic-legend">
-                    <div class="legend-item">
-                      <span class="legend-color upload"></span>
-                      <span data-i18n="status.upload">上传</span>
-                    </div>
-                    <div class="legend-item">
-                      <span class="legend-color download"></span>
-                      <span data-i18n="status.download">下载</span>
-                    </div>
+                    <div class="legend-item"><span class="legend-color upload"></span><span data-i18n="status.upload">上传</span></div>
+                    <div class="legend-item"><span class="legend-color download"></span><span data-i18n="status.download">下载</span></div>
                   </div>
                 </div>
                 <div class="traffic-stats">
                   <div class="traffic-stat-row">
-                    <span class="stat-label">
-                      <mdui-icon name="arrow_upward" style="color: var(--monet-primary, #4caf50)"></mdui-icon>
-                      <span data-i18n="status.upload">上传</span>
-                    </span>
-                    <span>
-                      <span class="stat-value" id="traffic-upload">0</span>
-                      <span class="stat-unit">MB</span>
-                    </span>
+                    <span class="stat-label"><mdui-icon name="arrow_upward" style="color: var(--monet-primary, #4caf50)"></mdui-icon><span data-i18n="status.upload">上传</span></span>
+                    <span><span class="stat-value" id="traffic-upload">0</span><span class="stat-unit">MB</span></span>
                   </div>
                   <div class="traffic-stat-row">
-                    <span class="stat-label">
-                      <mdui-icon name="arrow_downward" style="color: var(--monet-secondary, #2196f3)"></mdui-icon>
-                      <span data-i18n="status.download">下载</span>
-                    </span>
-                    <span>
-                      <span class="stat-value" id="traffic-download">0</span>
-                      <span class="stat-unit">MB</span>
-                    </span>
+                    <span class="stat-label"><mdui-icon name="arrow_downward" style="color: var(--monet-secondary, #2196f3)"></mdui-icon><span data-i18n="status.download">下载</span></span>
+                    <span><span class="stat-value" id="traffic-download">0</span><span class="stat-unit">MB</span></span>
                   </div>
                 </div>
               </div>
             </div>
 
             <div class="common-card half-width height-1" id="card-cpu" style="display: none">
-              <div class="card-delete-btn">
-                <mdui-icon name="close"></mdui-icon>
-              </div>
+              <div class="card-delete-btn"><mdui-icon name="close"></mdui-icon></div>
               <div class="card-header">
                 <mdui-icon name="memory" class="card-icon"></mdui-icon>
-                <span class="card-title" data-i18n="dashboard.cpu">CPU 使用率</span>
+                <span class="card-title" data-i18n="dashboard.cpu">CPU</span>
               </div>
-              <div class="card-content">
-                <div class="card-value" id="cpu-usage">--%</div>
-              </div>
+              <div class="card-content"><div class="card-value" id="cpu-usage">--%</div></div>
             </div>
 
             <div class="common-card half-width height-1" id="card-memory" style="display: none">
-              <div class="card-delete-btn">
-                <mdui-icon name="close"></mdui-icon>
-              </div>
+              <div class="card-delete-btn"><mdui-icon name="close"></mdui-icon></div>
               <div class="card-header">
                 <mdui-icon name="storage" class="card-icon"></mdui-icon>
-                <span class="card-title" data-i18n="dashboard.memory">内存使用率</span>
+                <span class="card-title" data-i18n="dashboard.memory">RAM</span>
               </div>
-              <div class="card-content">
-                <div class="card-value" id="memory-usage">--%</div>
-              </div>
+              <div class="card-content"><div class="card-value" id="memory-usage">--%</div></div>
             </div>
           </div>
 
@@ -292,65 +204,43 @@
           </div>
         </div>
 
+        <!-- Config Page -->
         <div id="config-page" class="page">
           <div class="container">
             <mdui-card variant="elevated">
               <div style="padding: 20px">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                <div style="display: flex; align-items: center; justify-content: between; margin-bottom: 16px;">
                   <h2 style="margin: 0; font-size: 20px; flex-grow: 1" data-i18n="config.management">节点管理</h2>
                   <mdui-dropdown id="import-menu">
                     <mdui-button slot="trigger" icon="add" id="add-config-btn" data-i18n="common.add">添加</mdui-button>
                     <mdui-menu>
-                      <mdui-menu-item id="import-node-link">
-                        <mdui-icon slot="icon" name="link"></mdui-icon>
-                        <span data-i18n="config.add_node">添加节点</span>
-                      </mdui-menu-item>
-                      <mdui-menu-item id="import-full-config">
-                        <mdui-icon slot="icon" name="description"></mdui-icon>
-                        <span data-i18n="config.add_outbound">添加出站</span>
-                      </mdui-menu-item>
-                      <mdui-menu-item id="import-subscription">
-                        <mdui-icon slot="icon" name="rss_feed"></mdui-icon>
-                        <span data-i18n="config.add_sub">添加订阅</span>
-                      </mdui-menu-item>
+                      <mdui-menu-item id="import-node-link"><mdui-icon slot="icon" name="link"></mdui-icon><span data-i18n="config.add_node">添加节点</span></mdui-menu-item>
+                      <mdui-menu-item id="import-full-config"><mdui-icon slot="icon" name="description"></mdui-icon><span data-i18n="config.add_outbound">添加出站</span></mdui-menu-item>
+                      <mdui-menu-item id="import-subscription"><mdui-icon slot="icon" name="rss_feed"></mdui-icon><span data-i18n="config.add_sub">添加订阅</span></mdui-menu-item>
                     </mdui-menu>
                   </mdui-dropdown>
                 </div>
                 <mdui-tabs id="config-tabs" style="max-width: 100%; overflow-x: auto">
                   <mdui-tab value="loading" data-i18n="common.loading">加载中...</mdui-tab>
-                  <mdui-tab-panel slot="panel" value="loading">
-                    <mdui-list>
-                      <mdui-list-item>
-                        <mdui-circular-progress></mdui-circular-progress>
-                        <div slot="headline" data-i18n="common.loading">加载中...</div>
-                      </mdui-list-item>
-                    </mdui-list>
-                  </mdui-tab-panel>
                 </mdui-tabs>
               </div>
             </mdui-card>
           </div>
         </div>
 
+        <!-- App Proxy Page -->
         <div id="uid-page" class="page">
           <div class="container">
             <mdui-card variant="elevated" style="margin-bottom: 16px">
               <div style="padding: 20px">
                 <h2 style="margin: 0 0 16px 0; font-size: 18px" data-i18n="uid.app_settings">分应用设置</h2>
                 <mdui-segmented-button-group id="app-proxy-mode-group" selects="single" value="off" style="width: 100%">
-                  <mdui-segmented-button value="off" icon="power_settings_new">
-                    <span data-i18n="uid.mode_off">关闭</span>
-                  </mdui-segmented-button>
-                  <mdui-segmented-button value="whitelist" icon="rule">
-                    <span data-i18n="uid.mode_whitelist">白名单</span>
-                  </mdui-segmented-button>
-                  <mdui-segmented-button value="blacklist" icon="block">
-                    <span data-i18n="uid.mode_blacklist">黑名单</span>
-                  </mdui-segmented-button>
+                  <mdui-segmented-button value="off" icon="power_settings_new"><span data-i18n="uid.mode_off">关闭</span></mdui-segmented-button>
+                  <mdui-segmented-button value="whitelist" icon="rule"><span data-i18n="uid.mode_whitelist">白名单</span></mdui-segmented-button>
+                  <mdui-segmented-button value="blacklist" icon="block"><span data-i18n="uid.mode_blacklist">黑名单</span></mdui-segmented-button>
                 </mdui-segmented-button-group>
               </div>
             </mdui-card>
-
             <mdui-card variant="elevated" id="proxy-list-card">
               <div style="padding: 20px">
                 <div style="display: flex; align-items: center; margin-bottom: 16px;">
@@ -358,16 +248,14 @@
                   <mdui-button icon="add" id="add-uid-btn" data-i18n="common.add">添加</mdui-button>
                 </div>
                 <mdui-list id="uid-list">
-                  <mdui-list-item>
-                    <mdui-circular-progress></mdui-circular-progress>
-                    <div slot="headline" data-i18n="common.loading">加载中...</div>
-                  </mdui-list-item>
+                  <mdui-list-item><mdui-circular-progress></mdui-circular-progress><div slot="headline" data-i18n="common.loading">加载中...</div></mdui-list-item>
                 </mdui-list>
               </div>
             </mdui-card>
           </div>
         </div>
 
+        <!-- Logs Page -->
         <div id="logs-page" class="page">
           <div class="container">
             <mdui-card variant="elevated" class="compact-card">
@@ -381,275 +269,85 @@
               <mdui-tabs id="logs-tabs" value="service">
                 <mdui-tab value="service" data-i18n="logs.service_log">服务日志</mdui-tab>
                 <mdui-tab value="xray" data-i18n="logs.xray_log">Xray 日志</mdui-tab>
-                <mdui-tab-panel slot="panel" value="service">
-                  <div style="padding: 16px">
-                    <div class="log-container" id="service-log" style="max-height: 400px; overflow-y: auto">
-                      <mdui-circular-progress></mdui-circular-progress>
-                    </div>
-                  </div>
-                </mdui-tab-panel>
-                <mdui-tab-panel slot="panel" value="xray">
-                  <div style="padding: 16px">
-                    <div class="log-container" id="xray-log" style="max-height: 400px; overflow-y: auto">
-                      <mdui-circular-progress></mdui-circular-progress>
-                    </div>
-                  </div>
-                </mdui-tab-panel>
+                <mdui-tab-panel slot="panel" value="service"><div style="padding: 16px"><div class="log-container" id="service-log" style="max-height: 400px; overflow-y: auto"><mdui-circular-progress></mdui-circular-progress></div></div></mdui-tab-panel>
+                <mdui-tab-panel slot="panel" value="xray"><div style="padding: 16px"><div class="log-container" id="xray-log" style="max-height: 400px; overflow-y: auto"><mdui-circular-progress></mdui-circular-progress></div></div></mdui-tab-panel>
               </mdui-tabs>
             </mdui-card>
             <div style="padding: 16px; text-align: center; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-              <mdui-button variant="tonal" id="export-logs-btn" icon="folder_zip">
-                <span data-i18n="logs.save_logs">保存日志</span>
-              </mdui-button>
-              <mdui-button variant="tonal" id="export-all-btn" icon="backup">
-                <span data-i18n="logs.save_all">保存日志与配置</span>
-              </mdui-button>
-              <mdui-button variant="outlined" id="logs-back-btn" icon="arrow_back">
-                <span data-i18n="common.back_settings">返回设置</span>
-              </mdui-button>
+              <mdui-button variant="tonal" id="export-logs-btn" icon="folder_zip"><span data-i18n="logs.save_logs">保存日志</span></mdui-button>
+              <mdui-button variant="tonal" id="export-all-btn" icon="backup"><span data-i18n="logs.save_all">保存日志与配置</span></mdui-button>
+              <mdui-button variant="outlined" id="logs-back-btn" icon="arrow_back"><span data-i18n="common.back_settings">返回设置</span></mdui-button>
             </div>
           </div>
         </div>
 
+        <!-- Settings Page -->
         <div id="settings-page" class="page">
           <div class="container">
             <mdui-list>
-              <mdui-list-item icon="settings_applications" id="settings-module-entry" clickable>
-                <span data-i18n="settings.module">模块设置</span>
-                <mdui-icon slot="end-icon" name="chevron_right"></mdui-icon>
-              </mdui-list-item>
+              <mdui-list-item icon="settings_applications" id="settings-module-entry"><span data-i18n="settings.module">模块设置</span><mdui-icon slot="end-icon" name="chevron_right"></mdui-icon></mdui-list-item>
               <mdui-divider></mdui-divider>
-              <mdui-list-item icon="swap_vert" id="settings-proxy-entry" clickable>
-                <span data-i18n="settings.proxy">代理设置</span>
-                <mdui-icon slot="end-icon" name="chevron_right"></mdui-icon>
-              </mdui-list-item>
+              <mdui-list-item icon="swap_vert" id="settings-proxy-entry"><span data-i18n="settings.proxy">代理设置</span><mdui-icon slot="end-icon" name="chevron_right"></mdui-icon></mdui-list-item>
               <mdui-divider></mdui-divider>
-              <mdui-list-item icon="alt_route" id="settings-routing-entry" clickable>
-                <span data-i18n="settings.routing">路由规则</span>
-                <mdui-icon slot="end-icon" name="chevron_right"></mdui-icon>
-              </mdui-list-item>
+              <mdui-list-item icon="alt_route" id="settings-routing-entry"><span data-i18n="settings.routing">路由规则</span><mdui-icon slot="end-icon" name="chevron_right"></mdui-icon></mdui-list-item>
               <mdui-divider></mdui-divider>
-              <mdui-list-item icon="dns" id="settings-dns-entry" clickable>
-                <span data-i18n="settings.dns">DNS 设置</span>
-                <mdui-icon slot="end-icon" name="chevron_right"></mdui-icon>
-              </mdui-list-item>
+              <mdui-list-item icon="dns" id="settings-dns-entry"><span data-i18n="settings.dns">DNS 设置</span><mdui-icon slot="end-icon" name="chevron_right"></mdui-icon></mdui-list-item>
               <mdui-divider></mdui-divider>
-              <mdui-list-item icon="language" id="settings-language" clickable>
-                <span data-i18n="settings.language">语言设置</span>
-                <mdui-icon slot="end-icon" name="chevron_right"></mdui-icon>
-              </mdui-list-item>
+              <mdui-list-item icon="language" id="settings-language-entry"><span data-i18n="settings.language">语言设置</span><mdui-icon slot="end-icon" name="chevron_right"></mdui-icon></mdui-list-item>
               <mdui-divider></mdui-divider>
-              <mdui-list-item icon="palette" id="settings-theme" clickable>
-                <span data-i18n="settings.theme">主题与颜色</span>
-                <mdui-icon slot="end-icon" name="chevron_right"></mdui-icon>
-              </mdui-list-item>
+              <mdui-list-item icon="palette" id="settings-theme-entry"><span data-i18n="settings.theme">主题与颜色</span><mdui-icon slot="end-icon" name="chevron_right"></mdui-icon></mdui-list-item>
               <mdui-divider></mdui-divider>
-              <mdui-list-item icon="article" id="settings-logs-entry" clickable>
-                <span data-i18n="settings.logs">日志</span>
-                <mdui-icon slot="end-icon" name="chevron_right"></mdui-icon>
-              </mdui-list-item>
+              <mdui-list-item icon="article" id="settings-logs-entry"><span data-i18n="settings.logs">日志</span><mdui-icon slot="end-icon" name="chevron_right"></mdui-icon></mdui-list-item>
               <mdui-divider></mdui-divider>
-              <mdui-list-item icon="info" id="settings-about" clickable>
-                <span data-i18n="settings.about">关于</span>
-                <mdui-icon slot="end-icon" name="chevron_right"></mdui-icon>
-              </mdui-list-item>
+              <mdui-list-item icon="info" id="settings-about"><span data-i18n="settings.about">关于</span><mdui-icon slot="end-icon" name="chevron_right"></mdui-icon></mdui-list-item>
             </mdui-list>
           </div>
         </div>
 
+        <!-- Module Settings -->
         <div id="module-page" class="page">
           <div class="container">
-            <mdui-card variant="elevated" class="compact-card">
-              <div style="padding: 16px">
-                <h3 style="margin: 0 0 8px" data-i18n="settings.module">模块设置</h3>
-                <p style="margin: 0; color: var(--mdui-color-on-surface-variant); font-size: 14px;">
-                  <span data-i18n="module.desc">配置模块的基本行为</span>
-                </p>
-              </div>
-            </mdui-card>
+            <mdui-card variant="elevated" class="compact-card"><div style="padding: 16px"><h3 style="margin: 0 0 8px" data-i18n="settings.module">模块设置</h3><p style="margin: 0; color: var(--mdui-color-on-surface-variant); font-size: 14px;"><span data-i18n="module.desc">配置模块的基本行为</span></p></div></mdui-card>
             <mdui-list>
-              <mdui-list-item icon="power_settings_new">
-                <span data-i18n="module.autostart">开机自动启动</span>
-                <span slot="description" data-i18n="module.autostart_desc">开机后自动启动代理服务</span>
-                <mdui-switch slot="end-icon" id="module-auto-start"></mdui-switch>
-              </mdui-list-item>
+              <mdui-list-item icon="power_settings_new"><span data-i18n="module.autostart">开机自动启动</span><span slot="description" data-i18n="module.autostart_desc">开机后自动启动代理服务</span><mdui-switch slot="end-icon" id="module-auto-start"></mdui-switch></mdui-list-item>
               <mdui-divider></mdui-divider>
-              <mdui-list-item icon="phone_android">
-                <span data-i18n="module.oneplus_fix">OnePlus A16 兼容性修复</span>
-                <span slot="description" data-i18n="module.oneplus_fix_desc">OnePlus Android 16 系统兼容性修复（清理系统添加的 REJECT 规则）</span>
-                <mdui-switch slot="end-icon" id="module-oneplus-fix"></mdui-switch>
-              </mdui-list-item>
+              <mdui-list-item icon="phone_android"><span data-i18n="module.oneplus_fix">OnePlus A16 兼容性修复</span><span slot="description" data-i18n="module.oneplus_fix_desc">OnePlus Android 16 系统兼容性修复</span><mdui-switch slot="end-icon" id="module-oneplus-fix"></mdui-switch></mdui-list-item>
             </mdui-list>
-            <div style="padding: 16px; text-align: center">
-              <mdui-button variant="outlined" id="module-back-btn" icon="arrow_back">
-                <span data-i18n="common.back_settings">返回设置</span>
-              </mdui-button>
-            </div>
+            <div style="padding: 16px; text-align: center"><mdui-button variant="outlined" id="module-back-btn" icon="arrow_back"><span data-i18n="common.back_settings">返回设置</span></mdui-button></div>
           </div>
         </div>
 
-        <div id="routing-page" class="page">
+        <!-- Language Page -->
+        <div id="language-page" class="page">
           <div class="container">
-            <mdui-card variant="elevated" class="compact-card">
-              <div style="padding: 16px; display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                  <h3 style="margin: 0 0 8px" data-i18n="settings.routing">路由规则设置</h3>
-                  <p style="margin: 0; color: var(--mdui-color-on-surface-variant); font-size: 14px;">
-                    <span data-i18n="routing.desc">管理 Xray 路由规则</span>
-                  </p>
-                </div>
-                <mdui-dropdown>
-                  <mdui-button slot="trigger" icon="add" data-i18n="common.add">添加</mdui-button>
-                  <mdui-menu>
-                    <mdui-menu-item id="add-routing-rule-btn" icon="add">
-                      <span data-i18n="settings.routing.dialog_add">添加规则</span>
-                    </mdui-menu-item>
-                    <mdui-menu-item id="import-clash-rules-btn" icon="filter_alt">
-                      <span data-i18n="routing.import_clash">导入 Clash 规则</span>
-                    </mdui-menu-item>
-                  </mdui-menu>
-                </mdui-dropdown>
-              </div>
-            </mdui-card>
-            <mdui-list id="routing-rules-list" style="margin-top: 16px">
-              <mdui-list-item>
-                <mdui-circular-progress></mdui-circular-progress>
-                <span slot="description" data-i18n="common.loading">加载中...</span>
-              </mdui-list-item>
-            </mdui-list>
-            <div style="padding: 16px; text-align: center">
-              <mdui-button variant="outlined" id="routing-back-btn" icon="arrow_back">
-                <span data-i18n="common.back_settings">返回设置</span>
-              </mdui-button>
-            </div>
+            <mdui-card variant="elevated" class="compact-card"><div style="padding: 16px"><h3 style="margin: 0 0 8px" data-i18n="settings.language">语言设置</h3><p style="margin: 0 0 16px; color: var(--mdui-color-on-surface-variant); font-size: 14px;" data-i18n="settings.language_desc">选择应用显示语言</p>
+                <mdui-segmented-button-group id="language-group" selects="single" value="auto" style="width: 100%">
+                  <mdui-segmented-button value="auto" data-i18n="settings.language.auto">自动</mdui-segmented-button>
+                  <mdui-segmented-button value="zh-CN">简体中文</mdui-segmented-button>
+                  <mdui-segmented-button value="en-US">English</mdui-segmented-button>
+                  <mdui-segmented-button value="ru-RU">Русский</mdui-segmented-button>
+                </mdui-segmented-button-group>
+              </div></mdui-card>
+            <div style="padding: 16px; text-align: center"><mdui-button variant="outlined" id="language-back-btn" icon="arrow_back"><span data-i18n="common.back_settings">返回设置</span></mdui-button></div>
           </div>
         </div>
 
-        <div id="dns-page" class="page">
-          <div class="container">
-            <mdui-card variant="elevated" class="compact-card">
-              <div style="padding: 16px">
-                <h3 style="margin: 0 0 8px" data-i18n="settings.dns">DNS 设置</h3>
-                <p style="margin: 0; color: var(--mdui-color-on-surface-variant); font-size: 14px;">
-                  <span data-i18n="dns.desc">管理 DNS 服务器和静态 Hosts 映射</span>
-                </p>
-              </div>
-            </mdui-card>
-            <mdui-tabs id="dns-tabs" value="servers" style="margin-top: 16px">
-              <mdui-tab value="servers" data-i18n="dns.servers">DNS 服务器</mdui-tab>
-              <mdui-tab value="hosts" data-i18n="dns.hosts">静态 Hosts</mdui-tab>
-              <mdui-tab-panel slot="panel" value="servers">
-                <div style="display: flex; justify-content: flex-end; padding: 12px 0;">
-                  <mdui-button id="add-dns-server-btn" icon="add" data-i18n="settings.dns.server_dialog_add">添加服务器</mdui-button>
-                </div>
-                <mdui-list id="dns-servers-list">
-                  <mdui-list-item>
-                    <mdui-circular-progress></mdui-circular-progress>
-                    <span slot="description" data-i18n="common.loading">加载中...</span>
-                  </mdui-list-item>
-                </mdui-list>
-              </mdui-tab-panel>
-              <mdui-tab-panel slot="panel" value="hosts">
-                <div style="display: flex; justify-content: flex-end; padding: 12px 0;">
-                  <mdui-button id="add-dns-host-btn" icon="add" data-i18n="settings.dns.host_dialog_add">添加 Host</mdui-button>
-                </div>
-                <mdui-list id="dns-hosts-list">
-                  <mdui-list-item>
-                    <mdui-circular-progress></mdui-circular-progress>
-                    <span slot="description" data-i18n="common.loading">加载中...</span>
-                  </mdui-list-item>
-                </mdui-list>
-              </mdui-tab-panel>
-            </mdui-tabs>
-            <div style="padding: 16px; text-align: center">
-              <mdui-button variant="outlined" id="dns-back-btn" icon="arrow_back">
-                <span data-i18n="common.back_settings">返回设置</span>
-              </mdui-button>
-            </div>
-          </div>
-        </div>
-
-        <div id="proxy-settings-page" class="page">
-          <div class="container">
-            <mdui-card variant="elevated" class="compact-card">
-              <div style="padding: 16px">
-                <h3 style="margin: 0 0 8px" data-i18n="settings.proxy">代理设置</h3>
-                <p style="margin: 0; color: var(--mdui-color-on-surface-variant); font-size: 14px;">
-                  <span data-i18n="proxy.desc">配置哪些流量需要通过代理</span>
-                </p>
-              </div>
-            </mdui-card>
-            <div style="padding: 16px 0; text-align: right">
-              <mdui-button id="proxy-save-btn" icon="save" data-i18n="common.save">保存设置</mdui-button>
-            </div>
-            <mdui-card variant="outlined" style="margin-top: 16px">
-              <div style="padding: 16px">
-                <h4 style="margin: 0 0 16px" data-i18n="settings.proxy.group_core">核心配置</h4>
-                <mdui-list>
-                  <mdui-list-item>
-                    <span data-i18n="settings.proxy.proxy_mode">代理模式</span>
-                    <mdui-select slot="end-icon" id="proxy-mode-settings" value="0" style="width: 140px">
-                      <mdui-menu-item value="0" data-i18n="settings.proxy.mode_auto">自动</mdui-menu-item>
-                      <mdui-menu-item value="1" data-i18n="settings.proxy.mode_tproxy">TPROXY</mdui-menu-item>
-                      <mdui-menu-item value="2" data-i18n="settings.proxy.mode_redirect">REDIRECT</mdui-menu-item>
-                    </mdui-select>
-                  </mdui-list-item>
-                  <div style="display: flex; gap: 16px; margin-top: 8px">
-                    <mdui-text-field label="TCP 端口" id="proxy-tcp-port" type="number" style="flex: 1" data-i18n-label="settings.proxy.proxy_tcp_port"></mdui-text-field>
-                    <mdui-text-field label="UDP 端口" id="proxy-udp-port" type="number" style="flex: 1" data-i18n-label="settings.proxy.proxy_udp_port"></mdui-text-field>
-                  </div>
-                  <div style="display: flex; gap: 16px; margin-top: 8px">
-                    <mdui-text-field label="路由表 ID" id="proxy-table-id" type="number" style="flex: 1" data-i18n-label="settings.proxy.table_id"></mdui-text-field>
-                  </div>
-                </mdui-list>
-              </div>
-            </mdui-card>
-            <div style="padding: 16px; text-align: center">
-              <mdui-button variant="outlined" id="proxy-settings-back-btn" icon="arrow_back">
-                <span data-i18n="common.back_settings">返回设置</span>
-              </mdui-button>
-            </div>
-          </div>
-        </div>
       </mdui-layout-main>
 
-      <mdui-navigation-bar id="nav-bar">
+      <!-- Bottom Nav -->
+      <mdui-navigation-bar value="status" id="nav-bar">
         <mdui-navigation-bar-item icon="home" value="status" data-i18n="nav.status">状态</mdui-navigation-bar-item>
-        <mdui-navigation-bar-item icon="list" value="config" data-i18n="nav.config">节点</mdui-navigation-bar-item>
-        <mdui-navigation-bar-item icon="apps" value="uids" data-i18n="nav.uids">应用代理</mdui-navigation-bar-item>
+        <mdui-navigation-bar-item icon="article" value="config" id="nav-config" data-i18n="nav.config">节点</mdui-navigation-bar-item>
+        <mdui-navigation-bar-item icon="apps" value="uid" data-i18n="nav.uids">应用</mdui-navigation-bar-item>
         <mdui-navigation-bar-item icon="settings" value="settings" data-i18n="nav.settings">设置</mdui-navigation-bar-item>
       </mdui-navigation-bar>
     </mdui-layout>
 
-    <mdui-dialog id="dns-server-dialog" headline="DNS 服务器" close-on-overlay-click="false" style="--mdui-dialog-max-width: 500px" data-i18n-headline="dns.servers">
-      <div style="display: flex; flex-direction: column; gap: 12px">
-        <mdui-text-field label="服务器地址" id="dns-server-address" placeholder="例如: 8.8.8.8 或 https://dns.google/dns-query" style="width: 100%" data-i18n-label="dns.server_address" data-i18n-helper="dns.server_address_helper"></mdui-text-field>
-        <mdui-text-field label="标签" id="dns-server-tag" placeholder="例如: google" helper="Tag (可选)" style="width: 100%" data-i18n-label="settings.dns.label_tag" data-i18n-helper="dns.tag"></mdui-text-field>
-        <mdui-text-field label="策略规则" id="dns-server-detour" placeholder="例如: proxy" helper="出站 Tag (可选)" style="width: 100%" data-i18n-label="dns.detour" data-i18n-helper="dns.detour_helper"></mdui-text-field>
-      </div>
-      <mdui-button slot="action" variant="text" id="dns-server-cancel" data-i18n="common.cancel">取消</mdui-button>
-      <mdui-button slot="action" variant="filled" id="dns-server-save" data-i18n="common.save">保存</mdui-button>
-    </mdui-dialog>
+    <div class="dashboard-fab" id="dashboard-fab">
+      <mdui-fab id="service-fab" icon="play_arrow" extended><span class="fab-runtime" id="fab-runtime"></span></mdui-fab>
+    </div>
 
-    <mdui-dialog id="dns-host-dialog" headline="静态 Host" close-on-overlay-click="false" style="--mdui-dialog-max-width: 500px" data-i18n-headline="dns.hosts">
-      <div style="display: flex; flex-direction: column; gap: 12px">
-        <mdui-text-field label="域名" id="dns-host-domain" placeholder="域名或 geosite 规则" helper="示例: example.com 或 geosite:category-ads-all" style="width: 100%" data-i18n-label="dns.host_domain" data-i18n-helper="dns.host_domain_helper"></mdui-text-field>
-        <mdui-text-field label="目标 IP" id="dns-host-ip" placeholder="IP 地址，多个用逗号分隔" helper="示例: 127.0.0.1 或 192.168.1.1" style="width: 100%" data-i18n-label="dns.host_ip" data-i18n-helper="dns.host_ip_helper"></mdui-text-field>
-      </div>
-      <mdui-button slot="action" variant="text" id="dns-host-cancel" data-i18n="common.cancel">取消</mdui-button>
-      <mdui-button slot="action" variant="filled" id="dns-host-save" data-i18n="common.save">保存</mdui-button>
-    </mdui-dialog>
-
-    <!-- Language Selection Dialog -->
-    <mdui-dialog id="language-dialog" headline="Language" data-i18n-headline="settings.language">
-      <mdui-list id="language-list">
-        <mdui-list-item clickable value="zh-CN">简体中文</mdui-list-item>
-        <mdui-list-item clickable value="en-US">English</mdui-list-item>
-        <mdui-list-item clickable value="ru-RU">Русский</mdui-list-item>
-      </mdui-list>
-      <mdui-button slot="action" variant="text" id="language-cancel" data-i18n="common.cancel">取消</mdui-button>
-    </mdui-dialog>
-
-    <script src="/src/main.ts" type="module"></script>
+    <!-- IMPORTANT FIX: Change app.ts to main.ts -->
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
